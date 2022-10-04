@@ -9,11 +9,11 @@
           ></v-img>
           <div class="contenedor-poster">
             <v-img :src="this.detallePelicula.poster" class="poster"></v-img>
-            <v-file-input
+            <v-file-input  v-if="this.$store.state.token != ''"
               :rules="rules"
               accept="image/png, image/jpeg, image/bmp"
               placeholder="Pick an avatar"
-              prepend-icon="mdi-camera"
+              prepend-icon="mdi-camera white"
               label="Avatar"
               hide-input
               v-model="poster"
@@ -22,37 +22,70 @@
               rounded
               color="white"
               background-color="white"
+              
             ></v-file-input>
-            <b-btn class="boton-editar" @click="editar">Editar</b-btn>
+            <b-btn
+              v-if="this.$store.state.token != ''"
+              class="boton-editar red--text"
+              @click="editar"
+              >Editar</b-btn
+            >
           </div>
 
           <div class="contenedor-detalle">
             <h3 class="titulo">{{ this.detallePelicula.tituloOriginal }}</h3>
 
-            <p class="sinopsis">
+            <p class="sinopsis parrafo font-weight-black">
               Vista general: <br />
+              <br />
               {{ this.detallePelicula.sinopsis }}
             </p>
-            <p>{{ this.detallePelicula.genero }}</p>
-            <p>Director: <br />{{ this.detallePelicula.director }}</p>
-            <p>Escritor: <br />{{ this.detallePelicula.escritor }}</p>
+            <p class="parrafo font-weight-black">
+              {{ this.detallePelicula.genero }}
+            </p>
+
+            <p class="parrafo font-weight-black">
+              Director: <br />
+              <br />{{ this.detallePelicula.director }}
+            </p>
+
+            <p class="parrafo font-weight-black">
+              Escritor: <br />
+              <br />{{ this.detallePelicula.escritor }}
+            </p>
+            <v-btn
+              v-if="this.$store.state.token != ''"
+              large
+              icon
+              color="pink"
+              @click="subirFavoritos"
+            >
+              <v-icon>mdi-heart</v-icon>
+            </v-btn>
           </div>
+          <v-file-input v-if="this.$store.state.token != ''"
+            :rules="rules"
+            accept="image/png, image/jpeg, image/bmp"
+            placeholder="Pick an avatar"
+            prepend-icon="mdi-camera"
+            label="Avatar"
+            hide-input
+            v-model="foto"
+            @change="subirFoto()"
+            rounded
+            color="white"
+            class="boton-file"
+            
+          ></v-file-input>
 
-          <v-file-input
-              :rules="rules"
-              accept="image/png, image/jpeg, image/bmp"
-              placeholder="Pick an avatar"
-              prepend-icon="mdi-camera"
-              label="Avatar"
-              hide-input
-              v-model="foto"
-              @change="subirFoto()"
-              rounded
-              color="white"
-              class="boton-file"
-            ></v-file-input>
-
-            <v-btn class="boton-borrar" @click="borrar" rounded><v-icon>mdi-delete</v-icon></v-btn>
+          <v-btn
+            v-if="this.$store.state.token != ''"
+            class="boton-borrar"
+            @click="borrar"
+            rounded
+          >
+            <v-icon>mdi-delete</v-icon>
+          </v-btn>
         </div>
       </v-col>
       <v-col>
@@ -96,7 +129,7 @@ export default {
     transparent: "rgba(255, 255, 255, 0)",
     repartoPrincipal: [],
     poster: [],
-    foto:[]
+    foto: [],
   }),
 
   methods: {
@@ -121,7 +154,8 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
-          this.$store.state.pelicula.poster = response.data.url; /* hacer esto con un state y un commit */
+          this.$store.state.pelicula.poster =
+            response.data.url; /* hacer esto con un state y un commit */
         })
         .catch((error) => {
           console.log(error);
@@ -142,7 +176,8 @@ export default {
         )
         .then((response) => {
           console.log(response.data);
-          this.$store.state.pelicula.foto = response.data.url; /* hacer esto con un state y un commit */
+          this.$store.state.pelicula.foto =
+            response.data.url; /* hacer esto con un state y un commit */
         })
         .catch((error) => {
           console.log(error);
@@ -162,24 +197,54 @@ export default {
           console.log(error);
         });
     },
+    subirFavoritos() {
+      let header = { headers: { "x-token": this.$store.state.token } };
+      console.log("id de la pelicula" + this.detallePelicula._id);
+      console.log("id del usuario" + this.$store.state.datos._id);
+      axios
+        .post(
+          "https://movies25.herokuapp.com/api/favoritos",
+          {
+            idPelicula: this.detallePelicula._id,
+            idUsuario: this.$store.state.datos._id,
+          },
+          header
+        )
+        .then((res) => {
+          console.log(res.data);
+          this.$swal({
+            icon: "success",
+            title: `${this.detallePelicula.tituloOriginal} fue agregada a favoritos`,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          this.$swal({
+            icon: "error",
+            title: `Error al agregar la pelicula a favoritos`,
+          });
+        });
+    },
     editar() {
-      this.$router.push('/formuPelicula')
+      this.$router.push("/formuPelicula");
       console.log(this.$store.state.pelicula._id);
     },
-    borrar(){
+    borrar() {
       let header = { headers: { "x-token": this.$store.state.token } };
       console.log(header);
       console.log(this.detallePelicula._id);
       axios
         .post(
-          `https://movies25.herokuapp.com/api/actores/delete/${this.detallePelicula._id}`,header)
+          `https://movies25.herokuapp.com/api/actores/delete/${this.detallePelicula._id}`,
+          header
+        )
         .then((response) => {
           console.log(response);
         })
         .catch((error) => {
           console.log(error);
         });
-    }
+    },
   },
   created() {
     this.traerPeliculas();
@@ -255,12 +320,11 @@ export default {
   /* border-radius: 40px; */
   padding-left: 8px;
   padding-bottom: 5px;
-
 }
 
 .boton-editar {
   position: absolute;
-  top:50px;
+  top: 50px;
 }
 
 .boton-borrar {
@@ -269,6 +333,7 @@ export default {
   background: black;
 }
 
+
 /* media queries  */
 
 @media screen and (max-width: 1030px) {
@@ -276,5 +341,6 @@ export default {
     font-size: 14px;
   }
 }
+
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Open+Sans:wght@400;600&display=swap");
 </style>

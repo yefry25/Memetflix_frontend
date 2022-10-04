@@ -1,7 +1,7 @@
 <template>
   <v-container fluid style="padding: 0;">
     <v-app-bar style="background: #141414">
-      <v-app-bar-nav-icon  @click="drawer = true" id="m"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="drawer = true" id="m"></v-app-bar-nav-icon>
       <div class="contiene">
         <h2 class="titulo-met">
           <router-link style="text-decoration: none; color: inherit" to="inicio"
@@ -43,7 +43,7 @@
                 >peliculas</v-list-item-title
               >
             </v-list-item>
-            <v-list-item to="perfil">
+            <v-list-item  v-if="this.$store.state.token!=''" to="perfil">
               <v-list-item-icon>
                 <v-icon class="item-icon">mdi-account</v-icon>
               </v-list-item-icon>
@@ -52,13 +52,13 @@
               >
             </v-list-item>
           </div>
-          <v-list-item to="formuPelicula">
+          <v-list-item v-if="this.$store.state.token!=''" to="formuPelicula">
             <v-list-item-icon>
               <v-icon class="item-icon">mdi-movie-roll</v-icon>
             </v-list-item-icon>
-            <v-list-item-title class="item-titulo">Registrar</v-list-item-title>
+            <v-list-item-title class="item-titulo">Registrar pelicula</v-list-item-title>
           </v-list-item>
-          <v-list-item to="formuActor">
+          <v-list-item v-if="this.$store.state.token!=''" to="formuActor">
             <v-list-item-icon>
               <v-icon class="item-icon">mdi-duck</v-icon>
             </v-list-item-icon>
@@ -66,13 +66,13 @@
               >registrar Actor</v-list-item-title
             >
           </v-list-item>
-          <v-list-item to="favorito">
+          <v-list-item v-if="this.$store.state.token!=''" to="favorito">
             <v-list-item-icon>
               <v-icon class="item-icon">mdi-tag-heart</v-icon>
             </v-list-item-icon>
             <v-list-item-title class="item-titulo">favoritos</v-list-item-title>
           </v-list-item>
-          <v-list-item to="actores">
+          <v-list-item v-if="this.$store.state.token!=''" to="actores">
             <v-list-item-icon>
               <v-icon class="item-icon">mdi-robot</v-icon>
             </v-list-item-icon>
